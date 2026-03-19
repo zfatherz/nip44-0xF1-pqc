@@ -167,8 +167,7 @@ because of its zero-dependency, auditable, browser-native nature.
 Deep respect to the @noble contributors and the Nostr core developers. I built this to ensure the "Notes" we transmit today remain private even in the post-quantum future.
 ***
 ## 📬 Contact & Source Mirroring
-- **Identity:** Verified via NIP-05 (Details coming soon).
-- **Codeberg:** https://codeberg.org/father_z/nip44-0xF1-pqc
+- **Identity:** Verified via NIP-05 (Details coming soon)
 - **GitHub:** https://github.com/zfatherz/nip44-0xF1-pqc
 ***
 ## License
