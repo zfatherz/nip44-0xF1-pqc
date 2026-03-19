@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════
+# The Vault: v0xF1 PQC Chat — root .gitignore
+# ═══════════════════════════════════════════════
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE / Editor ──
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+
+# ── Dependencies ──
+node_modules/
+
+# ── Build outputs ──
+dist/
+dist-ssr/
+build/
+out/
+*.local
+
+# ── Logs ──
+*.log
+*.txt
+
+# ── Environment & secrets ──
+.env
+.env.*
+
+# ── Runtime data ──
+*.db
+*.pid
+
+# ── Media (block all, whitelist README assets) ──
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.webm
+!nip44-0xF1.jpg
+!nip44-telemetry.jpg
+
+# ── Archives ──
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.*
+
+# ── Rust build artifacts ──
+# parent lib crate build
+backend/fuzz/target/
+# cargo-fuzz sub-crate build + runtime output
+backend/fuzz/fuzz/target/
+backend/fuzz/fuzz/corpus/
+backend/fuzz/fuzz/artifacts/
+
+# ── Vite build assets (unused boilerplate) ──
+frontend/src/assets/
