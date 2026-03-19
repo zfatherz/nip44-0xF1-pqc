@@ -168,7 +168,8 @@ Deep respect to the @noble contributors and the Nostr core developers. I built t
 ***
 ## 📬 Contact & Source Mirroring
 - **Identity:** Verified via NIP-05 (Details coming soon).
-- **GitHub Mirror:** https://github.com/zfatherz/nip44-0xF1-pqc
+- **Codeberg:** https://codeberg.org/father_z/nip44-0xF1-pqc
+- **GitHub:** https://github.com/zfatherz/nip44-0xF1-pqc
 ***
 ## License
 MIT
