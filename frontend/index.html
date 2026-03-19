@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Vault — v0xF1 PQC Chat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: #4fc3f7;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 12px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #111;
+    }
+    header h1 { font-size: 1.05rem; }
+    #relay-status { font-size: 0.75rem; color: #f44; }
+
+    /* ── Three-column grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 240px 200px 1fr;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Shared panel ── */
+    .panel {
+      border: 1px solid #1a1a1a;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    h2 {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #2196f3;
+      border-bottom: 1px solid #111;
+      padding-bottom: 5px;
+      flex-shrink: 0;
+    }
+
+    .field-label {
+      font-size: 0.65rem;
+      color: #1565c0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+    }
+
+    /* ── Buttons ── */
+    button {
+      background: #0a0a0a;
+      color: #4fc3f7;
+      border: 1px solid #4fc3f7;
+      padding: 7px 10px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover:not(:disabled) { background: #4fc3f7; color: #000; }
+    button:disabled { opacity: 0.2; cursor: default; }
+
+    /* ── Inputs ── */
+    input[type="text"] {
+      background: #0a0a0a;
+      color: #4fc3f7;
+      border: 1px solid #1a1a1a;
+      padding: 7px 9px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      width: 100%;
+    }
+    input[type="text"]:focus { outline: none; border-color: #2196f3; }
+    input[type="text"]::placeholder { color: #1a3a5c; }
+    input[type="text"]:disabled { opacity: 0.2; }
+
+    /* ── Identity panel ── */
+    .identity-panel { overflow-y: auto; }
+
+    #my-chat-id {
+      background: #050505;
+      border: 1px solid #111;
+      padding: 6px 7px;
+      font-size: 0.6rem;
+      word-break: break-all;
+      color: #1976d2;
+      line-height: 1.5;
+      min-height: 34px;
+    }
+
+    .fingerprint {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 5px 0;
+    }
+    .fp-byte {
+      font-size: 0.68rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .fp-note {
+      font-size: 0.6rem;
+      color: #0d3d6e;
+      line-height: 1.4;
+    }
+
+    #xwing-status { font-size: 0.7rem; color: #1565c0; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #111;
+      margin: 2px 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Contacts panel ── */
+    .contacts-panel { overflow: hidden; }
+
+    #contact-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 7px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      transition: background 0.1s;
+    }
+    .contact-item:hover  { background: #0a0a0a; }
+    .contact-item.active { border-color: #2196f3; background: #050505; }
+
+    .contact-online { font-size: 0.65rem; flex-shrink: 0; }
+    .contact-name   { flex: 1; font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .contact-seen   { font-size: 0.6rem; color: #1565c0; flex-shrink: 0; }
+
+    .badge {
+      background: #4fc3f7;
+      color: #000;
+      font-size: 0.6rem;
+      padding: 1px 5px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      font-weight: bold;
+    }
+
+    .no-contacts {
+      font-size: 0.72rem;
+      color: #0d3d6e;
+      text-align: center;
+      padding: 16px 8px;
+      line-height: 1.6;
+    }
+
+    /* ── Chat panel ── */
+    .chat-panel { overflow: hidden; }
+
+    #chat-placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #0d3d6e;
+      gap: 6px;
+    }
+    #chat-placeholder p { font-size: 0.8rem; }
+    #chat-placeholder small { font-size: 0.65rem; }
+
+    #chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #111;
+      padding-bottom: 8px;
+      flex-shrink: 0;
+      gap: 10px;
+    }
+    .chat-header-left  { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .chat-header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+    #chat-peer-name    { font-size: 0.9rem; font-weight: bold; }
+    #chat-peer-pubkey  { font-size: 0.6rem; color: #1565c0; }
+    #chat-peer-lock    { font-size: 0.7rem; }
+
+    .fingerprint.small .fp-byte { font-size: 0.6rem; }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      background: #030303;
+      border: 1px solid #111;
+      padding: 8px;
+      font-size: 0.78rem;
+      line-height: 1.65;
+    }
+
+    .msg-ts       { color: #282828; }
+    .msg-me       { color: #0cf; }
+    .msg-them     { color: #ff0; }
+    .tick         { color: #1565c0; font-size: 0.65rem; }
+    .tick.done    { color: #4fc3f7; }
+
+    .send-row {
+      display: flex;
+      gap: 6px;
+      align-items: stretch;
+      flex-shrink: 0;
+    }
+    .send-row input  { flex: 1; }
+    .send-row button { width: 90px; flex-shrink: 0; }
+
+    /* ── System log ── */
+    #logs {
+      height: 140px;
+      overflow-y: auto;
+      border: 1px dashed #1a3a5c;
+      padding: 5px 8px;
+      font-size: 0.65rem;
+      color: #90caf9;
+      line-height: 1.6;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛡️ The Vault: v0xF1 — PQC Chat</h1>
+    <span id="relay-status">● Connecting…</span>
+  </header>
+
+  <div class="grid">
+
+    <!-- ── Col 1: Identity ── -->
+    <div class="panel identity-panel">
+      <h2>Identity</h2>
+
+      <button id="btn-generate">Generate Burner Identity</button>
+
+      <div id="identity-block" style="display:none; flex-direction:column; gap:8px;">
+        <div>
+          <div class="field-label">Your Chat ID</div>
+          <div id="my-chat-id">—</div>
+        </div>
+        <button id="btn-copy-id">Copy Chat ID</button>
+        <div>
+          <div class="field-label">Key Fingerprint (share verbally)</div>
+          <div class="fingerprint" id="my-fingerprint"></div>
+          <div class="fp-note">Verify this matches your key in your peer's chat header.</div>
+        </div>
+        <div>
+          <div class="field-label">XWing Status</div>
+          <div id="xwing-status">Not published</div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+
+      <button id="btn-nuke" style="border-color: #f44; color: #f44; margin-top: 12px;">🔥 NUKE ALL</button>
+
+      <hr class="divider"/>
+
+      <h2>Add Contact</h2>
+      <input type="text" id="input-new-peer" placeholder="Peer's 64-char Chat ID…"/>
+      <input type="text" id="input-alias"    placeholder="Alias (optional)"/>
+      <button id="btn-add-contact">Add Contact</button>
+    </div>
+
+    <!-- ── Col 2: Contacts ── -->
+    <div class="panel contacts-panel">
+      <h2>Contacts</h2>
+      <div id="contact-list">
+        <div class="no-contacts">No contacts yet.<br>Add a peer by their Chat ID.</div>
+      </div>
+    </div>
+
+    <!-- ── Col 3: Chat ── -->
+    <div class="panel chat-panel">
+
+      <div id="chat-placeholder">
+        <p>← Select a contact</p>
+        <small>End-to-end PQC encrypted (ML-KEM-768 + X25519)</small>
+      </div>
+
+      <div id="chat-area" style="display:none;">
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <span id="chat-peer-name">—</span>
+            <span id="chat-peer-pubkey"></span>
+          </div>
+          <div class="chat-header-right">
+            <div class="fingerprint small" id="chat-peer-fp"></div>
+            <div id="chat-peer-lock"></div>
+          </div>
+        </div>
+
+        <div id="chat-messages"></div>
+
+        <div class="send-row">
+          <input type="text" id="input-msg" placeholder="Type your PQC-encrypted message…" disabled/>
+          <button id="btn-send" disabled>⚡ Send</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="logs"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

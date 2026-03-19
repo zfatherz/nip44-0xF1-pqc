@@ -1,0 +1,26 @@
+[package]
+name    = "vault-fuzz-fuzz"
+version = "0.0.1"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+vault-fuzz    = { path = ".." }
+
+# ── Fuzz targets (run via: cargo +nightly fuzz run <name>) ───────────────────
+
+[[bin]]
+name  = "fuzz_malformed"
+path  = "fuzz_targets/fuzz_malformed.rs"
+test  = false
+doc   = false
+
+[[bin]]
+name  = "fuzz_roundtrip"
+path  = "fuzz_targets/fuzz_roundtrip.rs"
+test  = false
+doc   = false
