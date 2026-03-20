@@ -37,36 +37,19 @@ This MVP proves hybrid PQC encryption is deployable *right now* on Nostr with ov
 | UI perception threshold | 100 ms — we use **< 1/5 of it**                       |
 |                         |                                                       |
 ***
-## ⚡ Bounty Pool: 126,000 sats (Difficulty-Tiered Challenge)
+## 🛑 BOUNTIES CANCELLED & ARCHITECTURE RESTRUCTURE
 
-Two tiers of engineering difficulty. Paid via Lightning Zap.
+**Status:** Challenge 1 (WebWorker) and Challenge 2 (WASM) are officially **CANCELLED**. The 126,000 sats pool is currently frozen.
 
-Solo project — if I'm slow to respond, I'm offline. All valid contributions reviewed and bounties paid in order received.
+### The Reality Check
+Telemetry proved `0xF1` is highly viable for 1-on-1 DMs (15–22ms). However, brute-forcing this O(N) KEM architecture for massive group chats is computationally bankrupt. Pushing the math to a background worker only hides the UI freeze; it does not fix the massive mobile battery drain. 
 
-### Challenge 1 — WebWorker Async Pipeline (21,000 sats × 4)
+Optimizing a fundamentally unscalable primitive is a sunk cost.
 
-This runs **synchronously on the main thread**. A 50-person encrypted group chat forces
-50 independent encapsulations: `50 × 20ms = 1000ms` of UI-blocking computation.
+### Next Steps
+I need time to deeply restructure the protocol. The goal is to figure out how to handle massive group chats efficiently without the O(N) KEM overhead per message. 
 
-**Goal:** Restructure `encrypt_v0xF1` into an async worker pipeline using **Transferable
-ArrayBuffers** — O(1) ownership transfer, zero serialization overhead.
-
-**Complexity:** Medium (architecture refactor). 4 separate rewards for unique approaches or significant optimizations.
-
-**Hard constraint:** No `SharedArrayBuffer`. No `COOP/COEP` headers (they block
-cross-origin relay WebSocket connections — the physical backbone of Nostr).
-
-### Challenge 2 — Industrial-Grade Rust/WASM Port (42,000 sats × 1)
-
-V8's JIT optimizer can eliminate `.fill(0)` as dead code — key material may survive
-in RAM after use. This is a structural limitation of JavaScript, not a bug.
-
-**Goal:** Port the `nip44.ts` crypto core to **Rust/WASM** with `zeroize::ZeroizeOnDrop`
-on all key material. Prove that the WASM runtime does not eliminate memory-clearing writes.
-
-**Complexity:** High (systems cryptography). **Winner-takes-all** — only the first verified, production-ready port is rewarded.
-
-**How to claim:** Open an Issue describing your approach → submit a PR → once merged, ping on Nostr with your LNURL for Zap.
+*The project is temporarily pausing optimizations while I audit new architectural models. Updates will follow.*
 ***
 ## Packet layout
 ```
